@@ -1,0 +1,217 @@
+---
+title: '2028232'
+author: "venkata sai krishna nivarthi 2028232"
+date: "20/04/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#a.	Identify a Business Problem from the given data set, with an objective to develop a prediction Model (Multiple Linear Regression) 
+###problem statement- A company with different type of employees with different designations with male and female are present, so to check the relationship between the employees with the work performance with different variables, we need to check the relationship of creative personality(dependent variable) of the employees in the company according to the different independent variables(for metrics), and checking whether there is relationship between the dependent variable and other independnet variables from the dataset.
+
+###b.	Based on the data set provided, identify the problem considering the present global and social scenario and select dependent variable (can make certain assumptions based on research articles or papers) 
+###so the problem is that,there are many employees in the company but the employees are affected by different distractions in the company, so in order to know which are the independent variable are responsible for the distraction and taking into the consideration, we need to find the how to increase the motivation among the employees with different designations, so from the analysis and interpretation we can say that the dependnet variable creative personality can be developed by making the work environment better.so by improving the work environment, the employees creative personality will increase and then in turn company will be developed.As the employees are the asset for the company.
+
+##importing te dataset from the excel 
+```{r}
+data1=read.csv("C:\\Users\\aravi\\Desktop\\New folder (3)\\psychology data set.csv", stringsAsFactors = TRUE)
+str(data1)
+View(data1)
+summary(data1) #checking the summary of the data
+dim(data1)   #checking the dimensions of the data
+
+```
+#dividing the dataset into 2 parts testing and training, using 70 percent we buit model(training) and 30 percent for testing
+
+```{r}
+
+#removing missing values from complete data set
+dim(data1)
+
+data2=na.omit(data1)
+dim(data2)
+summary(data2)
+```
+###if we compare the dim(data1) and dim(data2), there are no missing values in the data, so we can proceed to multiple regression analysis
+#a)	Create a subset of 90% data, All analysis has to be done on the same 90% data subset. Use set.seed(XX), with XX as your registration number for subsetting
+```{r}
+# we are using caTools to divide the data into training data and testing data
+#90 percent of the data is traininf data and 10percent is testing data
+library(caTools)
+set.seed(2028232)
+split1=sample.split(data1$sno, SplitRatio = 0.90)
+datatest=subset(data1,split1==FALSE)  #false means it will create the test data
+datatrain=subset(data1, split1== TRUE)  #true means it will create the train data
+dim(datatest)  #dimensions of datatest
+dim(datatrain)  #dimensions of the datatrain
+
+```
+###there are 25 variables in the testing data and 216 variables in the training data
+
+```{r}
+
+#multiple regression
+##creating the multiple regression using creative personality as dependent variable and other variables are independent variables.
+
+reg1 = lm(data1$Creative.Personality~
+            data1$Age+data1$Block.to.creativity+
+          data1$Innovative.sponsoring.capabilities+data1$Social.Environment+data1$Work.environment, data = datatrain)
+
+
+summary(reg1)  #summary of the regression
+
+
+```
+
+```{r}
+
+#b)	Explain Regression ANOVA
+##  the below code is used for finding the  relationship between the dependent and independent variable, the relationship can be found by checking the value of the AIC
+
+library(MASS)
+# stepAIC() is used to find which model is best in all the models present in reg1
+regmodel1 = stepAIC(reg1, direction = "backward", trace = 1)
+summary(regmodel1)
+regmodel1$anova
+
+##in the backward direction, we need to take the least AIC value, so that the model will be good fit, so in this case data1$Age is having least AIC, so it will be considered and it is good fit.
+## the final best model suits for finding the relationship can be found using anova
+
+regmodel2 = stepAIC(reg1, direction = "forward", trace = 1)
+summary(regmodel2)
+regmodel2$anova
+#in the forward direction, we need to take the least AIC value, so that the model will be good fit, so in this case data1$Age is having least AIC, so it will be considered and it is good fit.
+
+regmodel3 = stepAIC(reg1, direction = "both", trace = 1)
+summary(regmodel3)
+regmodel3$anova
+#in both the directions, we need to take the least AIC value, so that the model will be good fit, so in this case data1$Age is having least AIC, so it will be considered and it is good fit.
+
+## Here the above code is used for finding relationship using both, forward and backward directions for the dataset in Anova
+
+
+
+```
+###from multiple regression, the person's creativity depends on age, block to creativity, Innovative.sponsoring.capabilities, social environment, and work environment, if all these are good for a person, then he/ she will excel in their job lifes.
+###regression- H0= model is not good fit, h1= model is good fit
+###so the p value is less than 0.05, we reject the null hypothesis, and accept the alternate hypothesis, this means that there is a relation ship between the independent and dependent variables.so from this we can say that  age, block to creativity, Innovative.sponsoring.capabilities, social environment, and work environment depends on Creative.Personality
+##c) c.	Explain R-Square and Adjusted R-Square 
+### the r-square is coff of determination, r-square value is 0.2182 i.e, 21% of the data fits the model, 21% close to the data is fitted in regression line, it is also called as coeficient of determination.21% of the variance of the Creative.Personality being studied is explained by the variance of the age, block to creativity, Innovative.sponsoring.capabilities, social environment, and work environment. The adjusted r square says the relationship between the dependent variabe and independent variabes is depected by the equation y=a+b1x+b2x+b3x+b4x+b5x, so there is 0.2015 i.e, 20 percent relationship between the dependent nd ndependet variables.
+###d) d.	Explain beta coefficients of the model
+###the beta coff of the model- the p value of age is greatr than 0.05, so we accept the null hypothesis, we can say that, the model is not good fit and therse is no relationship between age and the creative personality.
+###the p value of the Block.to.creativity is less than 0.05 so, we will reject the null hypothesis and accept the alternate hypothesis, so increase in one point of Block.to.creativity, there will be decrease in -0.21309 in creative personality
+###the p value of Innovative.sponsoring.capabilities is greatr than 0.05, so we accept the null hypothesis, we can say that, the model is not good fit and therse is no relationship between Innovative.sponsoring.capabilities and the creative personality.
+###the p value of Social.Environment is greatr than 0.05, so we accept the null hypothesis, we can say that, the model is not good fit and therse is no relationship between Social.Environment and the creative personality.
+###the p value of the Work.environment is less than 0.05 so, we will reject the null hypothesis and accept the alternate hypothesis, so increase in one point of Work.environment, there will be increase in 1.81325 in creative personality
+###so the work environmnet should be better for the person to work, so that it will enchance the mood and it provides the motivation to work
+
+```{r}
+#e)	Explain Multicollinearity with respect to the model
+# checking multicolinearity
+library(car)  #library car is used to find the multicolinearity
+vif(reg1)
+
+```
+
+###from this we can say that if vif is greater than 2.5, there will be high multicolinearity , so all the variables like age, block to creativity, innovative sponsoring capabilities, social environment, work environment has less colinearity so there is no occurance of high multi colinearity between two or more independent variables in a multiple regression in this data set. soo  independent variables are lowely correlated with one or more of the other independent variables. 
+
+```{r}
+
+#f)	Explain Heteroscedasticity of residual 
+#ho = data is homoscadisticity
+# h1 = data is hetroscadisticity
+library(lmtest)
+bptest(reg1) 
+```
+# as p value is lesser than 0.05 we will be reject the null hypothesis and accept the alternate hypothesis, i.e, data is hetroscadisticity
+
+```{r}
+
+#g) checking normality of residual
+#skweness and kurtosis
+library(psych)
+library(pastecs)
+#check normality of residual
+qqnorm(reg1$residuals)
+##in between we can see the normality, but we cannit see the normality of the variables at the end nd startinf og the graph, so it is not normally disturbed.
+
+# test for normality
+# h0 = data is  normally distributed
+# h1 = data is not normally distributed
+# shapiro test is used to test normality
+shapiro.test(reg1$residuals) 
+```
+##shapito test is used for the normality, the p value is less than 0.05 we can say that data is not normally disturbed, so that we can reject the null hypothesis i.e, h0 is not normally distribted and we accept the alternte hypothesis
+
+
+
+```{r}
+
+#h.	Explain Autocorrelation
+library(lmtest)
+bptest(reg1)
+```
+
+##the p value is 0.02554 which means the correlation between points separated by various time lags from the data given.
+
+
+##3) a.	Explain the application of the model proposed
+##from the analysis we can say that the work envinonment should be increased so that the employees creative personality will be improved
+##1)the employees should be risk takers. Creative thinkers are risk takers.
+##2)the employees should be dare to fail attitude.
+##3)the employees should be willing to be different from other employees.
+##4)the employees should be impulsive, fickle and change their mind quite often according to the situation.
+
+
+
+##4) ethical and social issues
+###1) Discrimination and Harassment - discriminatona and harrasement should be removed from the work environment , because the employees will be mentally disturbed within the company, so to improve the creative personality, the work environment should be good and it should be peacefull.
+###2) Conflicting Goals- the goals of the employees present it the each department should be same, so that there will be understanding between the employees and there will be growth in the company. So that the conflicting goals should be removed from every department, so that the creative personality of the every employee will be developed in the company.
+###3) leadership- the leader in the company should be jovial with the employees, so that the employees can clear their doubts and the work will be fasten, and the ability of the employees will also increase, so the leader should not be unethical and he should be ready to face the problems and he should mingle with everyone
+###4) Health & Safety- the employees health and safety should be considered by the company, in order to develop the company, the manager should take care of the health and safety of the employees in the company, so that the creative ability increases and the work done by the employees will be better than before.
+###5) Social Media- As Employees are attracted towards the social media, the company should provide the time to spend sometime on soial media, because they will be releived from them seves and they can concentrate on the work and their job, which inturn there will be satisfaction for the employees.
+###6) Privacy- privacy should be given to the employees, in order to increase the work concentartion on them, so that the employees will be satisfied and they will work effeciently and effectively.
+
+
+
+##conclusion- the multiple regression is used to compare the variables and to understand the dependency of the variables, so that we can get to know how variables are related, which varaibales are related and which are not, so from this we can say that the work environment should be increased, so the creatie personality of the employees increases.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
